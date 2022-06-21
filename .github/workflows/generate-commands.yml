@@ -22,12 +22,12 @@ jobs:
             - name: Setup PHP, with Composer and extensions
               uses: shivammathur/setup-php@v2
               with:
-                php-version: 8.1
+                php-version: 8.0
                 extensions: dom, curl, libxml, mbstring, zip
                 tools: composer:v2
 
             - name: Install Laravel
-              run: composer create-project --prefer-dist --no-progress laravel/laravel="^${{ matrix.laravel }}" /tmp/laravel
+              run: composer create-project --no-progress laravel/laravel="^${{ matrix.laravel }}" /tmp/laravel
 
             - name: Build Generator Command
               run: |
