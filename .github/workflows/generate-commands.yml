@@ -33,7 +33,7 @@ jobs:
               run: |
                 cd /tmp/laravel
                 cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel }}.x.json
-                cp /tmp/${{ github.workspace }}.x.json ${{ github.workspace }}/pages/api/_data/
+                cp /tmp/${{ github.laravel }}.x.json ${{ github.workspace }}/pages/api/_data/
 
             - name: Update main branch
               run: git commit -am 'Update data'
