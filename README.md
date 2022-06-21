@@ -9,7 +9,7 @@ List all commands ([Try it](https://laravel-docs-api.vercel.app/api/commands))
 ```
 GET /api/commands
 ```
-Search for a command ([Try it](https://laravel-docs-api.vercel.app/api/commands?s=migrate))
+Search for a command ([Try it](https://laravel-docs-api.vercel.app/api/commands?s=database))
 ```
 GET /api/commands?s=database
 ```
