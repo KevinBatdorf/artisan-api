@@ -1,0 +1,44 @@
+name: Generate Laravel Commands
+on:
+  workflow_dispatch:
+  schedule:
+  # At 08:00 Friday
+  - cron: "0 8 * * 5"
+jobs:
+    generate:
+        name: Generate Commands
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                laravel: [6, 7, 8, 9]
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v2
+            - name: Set up git user
+              run: git config --global user.name kevin
+            - name: Set up git email
+              run: git config --global user.name kevin@users.noreply.github.com
+
+            - name: Setup PHP, with Composer and extensions
+              uses: shivammathur/setup-php@v2
+              with:
+                php-version: ${{ matrix.php }}
+                extensions: dom, curl, libxml, mbstring, zip
+                tools: composer:v2
+
+            - name: Install Laravel
+              run: composer create-project --prefer-dist --no-progress --no-suggest laravel/laravel="^${{ matrix.laravel }}" /tmp/laravel
+
+            - name: Build Generator Command
+              run: |
+                cd /tmp/laravel
+                cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel }}.x.json
+                cp /tmp/${{ matrix.laravel }}.x.json ${{ matrix.laravel }}/pages/api/_data/
+
+            - name: Update main branch
+              run: git commit -am 'Update data'
+            - name: Push changed files to main
+              uses: ad-m/github-push-action@master
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                branch: main

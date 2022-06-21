@@ -1,0 +1,6 @@
+{
+    "name": "kevin/laravel-doc-api",
+    "require": {
+        "laravel/framework": "^9.17"
+    }
+}
