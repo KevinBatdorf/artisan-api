@@ -32,7 +32,7 @@ jobs:
             - name: Build Generator Command
               run: |
                 cd /tmp/laravel
-                cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel }}.x.json
+                cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel }}.x.json | true
                 cp /tmp/${{ matrix.laravel }}.x.json ${{ github.workspace }}/pages/api/_data/
 
             - name: Update main branch
