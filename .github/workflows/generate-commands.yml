@@ -27,7 +27,7 @@ jobs:
                 tools: composer:v2
 
             - name: Install Laravel
-              run: composer create-project --prefer-dist --no-progress --no-suggest laravel/laravel="^${{ matrix.laravel }}" /tmp/laravel
+              run: composer create-project --prefer-dist --no-progress laravel/laravel="^${{ matrix.laravel }}" /tmp/laravel
 
             - name: Build Generator Command
               run: |
