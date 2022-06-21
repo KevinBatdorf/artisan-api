@@ -22,7 +22,7 @@ jobs:
             - name: Setup PHP, with Composer and extensions
               uses: shivammathur/setup-php@v2
               with:
-                php-version: ${{ matrix.php }}
+                php-version: 8.1
                 extensions: dom, curl, libxml, mbstring, zip
                 tools: composer:v2
 
