@@ -37,6 +37,7 @@ jobs:
 
             - name: Update main branch
               run: git commit -am 'Update data'
+              continue-on-error: true
             - name: Push changed files to main
               uses: ad-m/github-push-action@master
               with:
