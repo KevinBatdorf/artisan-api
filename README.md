@@ -1,7 +1,5 @@
 # Laravel Artisan Command API
 An API to search Laravel Artisan commands by version or keyword.
-
-Search
 ## Endpoints
 List available versions:
 ```
