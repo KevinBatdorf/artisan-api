@@ -15,9 +15,9 @@ jobs:
             - name: Check out code
               uses: actions/checkout@v2
             - name: Set up git user
-              run: git config --global user.name kevin
+              run: git config --global user.name ${GITHUB_ACTOR}
             - name: Set up git email
-              run: git config --global user.name kevin@users.noreply.github.com
+              run: git config --global user.email ${GITHUB_ACTOR}@users.noreply.github.com
 
             - name: Setup PHP, with Composer and extensions
               uses: shivammathur/setup-php@v2
@@ -33,16 +33,20 @@ jobs:
               run: |
                 cd /tmp/laravel
                 cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel }}.x.json | true
-                cp /tmp/${{ matrix.laravel }}.x.json ${{ github.workspace }}/pages/api/_data/
 
             - name: Update main branch
-              run: |
-                git pull
-                git commit -am 'Update data'
+              run: n=0
+                  until [ "$n" -ge 10 ]
+                  do
+                    git fetch --all
+                    git reset --hard HEAD
+                    git clean -f -d
+                    git pull || true
+                    cp /tmp/${{ matrix.laravel }}.x.json ${{ github.workspace }}/pages/api/_data/
+                    git add -A || true
+                    git commit -am 'Build Laravel version v${{ matrix.laravel }}' || true
+                    git push --force && break
+                    n=$((n+1))
+                    sleep 15
+                  done
               continue-on-error: true
-            - name: Push changed files to main
-              uses: ad-m/github-push-action@master
-              with:
-                github_token: ${{ secrets.GITHUB_TOKEN }}
-                branch: main
-                force: true
