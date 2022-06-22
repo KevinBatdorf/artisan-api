@@ -36,10 +36,13 @@ jobs:
                 cp /tmp/${{ matrix.laravel }}.x.json ${{ github.workspace }}/pages/api/_data/
 
             - name: Update main branch
-              run: git commit -am 'Update data'
+              run: |
+                git pull
+                git commit -am 'Update data'
               continue-on-error: true
             - name: Push changed files to main
               uses: ad-m/github-push-action@master
               with:
                 github_token: ${{ secrets.GITHUB_TOKEN }}
                 branch: main
+                force: true
