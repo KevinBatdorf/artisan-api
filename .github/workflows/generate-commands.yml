@@ -35,7 +35,8 @@ jobs:
                 cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel }}.x.json | true
 
             - name: Update main branch
-              run: n=0
+              run: |
+                  n=0
                   until [ "$n" -ge 10 ]
                   do
                     git fetch --all
