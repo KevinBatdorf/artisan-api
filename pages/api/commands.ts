@@ -1,8 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Fuse from 'fuse.js'
 import commands from './_data'
+import Cors from 'cors'
+import initMiddleware from '../../lib/init-middleware'
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+const cors = initMiddleware(Cors({ methods: ['GET', 'OPTIONS'] }))
+
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse,
+) {
+    await cors(req, res)
+
     const { v, s: search } = req.query
 
     if (req.method !== 'GET') {
