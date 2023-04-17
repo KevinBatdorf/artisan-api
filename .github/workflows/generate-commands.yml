@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                laravel: [6, 7, 8, 9]
+                laravel: [6, 7, 8, 9, 10]
         steps:
             - name: Check out code
               uses: actions/checkout@v2
