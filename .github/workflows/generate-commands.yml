@@ -13,7 +13,7 @@ jobs:
                 laravel: [6, 7, 8, 9, 10]
         steps:
             - name: Check out code
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Set up git user
               run: git config --global user.name ${GITHUB_ACTOR}
             - name: Set up git email
@@ -22,7 +22,7 @@ jobs:
             - name: Setup PHP, with Composer and extensions
               uses: shivammathur/setup-php@v2
               with:
-                php-version: 8.0
+                php-version: 8.2
                 extensions: dom, curl, libxml, mbstring, zip
                 tools: composer:v2
 
