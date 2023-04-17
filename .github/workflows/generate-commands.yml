@@ -6,11 +6,17 @@ on:
   - cron: "0 8 * * 5"
 jobs:
     generate:
-        name: Generate Commands
+        name: Laravel v${{ matrix.laravel.v }} - PHP ${{ matrix.laravel.php }}
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                laravel: [6, 7, 8, 9, 10]
+                laravel: [
+                  { v: 6, php: 8.0 },
+                  { v: 7, php: 8.0 },
+                  { v: 8, php: 8.0 },
+                  { v: 9, php: 8.0 },
+                  { v: 10, php: 8.2 }
+                ]
         steps:
             - name: Check out code
               uses: actions/checkout@v3
@@ -22,17 +28,17 @@ jobs:
             - name: Setup PHP, with Composer and extensions
               uses: shivammathur/setup-php@v2
               with:
-                php-version: 8.2
+                php-version: ${{ matrix.laravel.php }}
                 extensions: dom, curl, libxml, mbstring, zip
                 tools: composer:v2
 
             - name: Install Laravel
-              run: composer create-project --no-progress laravel/laravel="^${{ matrix.laravel }}" /tmp/laravel
+              run: composer create-project --no-progress laravel/laravel="^${{ matrix.laravel.v }}" /tmp/laravel
 
             - name: Run Generator Command
               run: |
                 cd /tmp/laravel
-                cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel }}.x.json | true
+                cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel.v }}.x.json | true
 
             - name: Update main branch
               run: |
@@ -43,9 +49,9 @@ jobs:
                     git reset --hard HEAD
                     git clean -f -d
                     git pull || true
-                    cp /tmp/${{ matrix.laravel }}.x.json ${{ github.workspace }}/pages/api/_data/
+                    cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/pages/api/_data/
                     git add -A || true
-                    git commit -am 'Build Laravel version v${{ matrix.laravel }}' || true
+                    git commit -am 'Build Laravel version v${{ matrix.laravel.v }}' || true
                     git push --force && break
                     n=$((n+1))
                     sleep 15
