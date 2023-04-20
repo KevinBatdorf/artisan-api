@@ -4,5 +4,9 @@ import v8 from "./8.x.json"
 import v7 from "./7.x.json"
 
 const commands = {
+	"10.x": v10,
+	"9.x": v9,
+	"8.x": v8,
+	"7.x": v7,
 }
 export default commands
