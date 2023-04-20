@@ -5,25 +5,44 @@ on:
   # At 08:00 Friday
   - cron: "0 8 * * 5"
 jobs:
+    fetch_laravel_versions:
+        name: Fetch Latest Laravel Versions
+        runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.fetch_versions.outputs.matrix }}
+        steps:
+          - name: Get versions from Packagist
+            id: fetch_versions
+            run: |
+                # Fetch the latest Laravel versions from Packagist
+                # Convert to JSON e.g {v: "8", php: ">=7.3.0"}
+                # Extract the versions and their PHP requirements
+                # Remove duplicate lines based on the first column
+                # Get major v only, dedupe, and combine on one line
+                # Output the JSON to the step output
+                curl -s https://packagist.org/packages/laravel/laravel.json \
+                | jq -r '.package.versions[] | select(.require.php != null) | select(.version_normalized != null) | .version_normalized, .require.php' \
+                | sed -e '/dev/,+1d' -e '1~2 s/\..*//' -e '2~2 s/|.*$//' -e 's/[^0-9]*//' \
+                | cut -f1,2 -d'.' \
+                | awk 'NR%2{printf "%s ",$0;next;}1' \
+                | sort -Vru -k1,1 | head -4 \
+                | jq -Rcn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \
+                | tee /tmp/versions.json
+                echo "matrix=$(cat /tmp/versions.json)" >> "$GITHUB_OUTPUT"
     generate:
+        needs: fetch_laravel_versions
         name: Laravel v${{ matrix.laravel.v }} - PHP ${{ matrix.laravel.php }}
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                laravel: [
-                  { v: 6, php: 8.0 },
-                  { v: 7, php: 8.0 },
-                  { v: 8, php: 8.0 },
-                  { v: 9, php: 8.0 },
-                  { v: 10, php: 8.2 }
-                ]
+                laravel: ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}
         steps:
             - name: Check out code
               uses: actions/checkout@v3
             - name: Set up git user
-              run: git config --global user.name ${GITHUB_ACTOR}
-            - name: Set up git email
-              run: git config --global user.email ${GITHUB_ACTOR}@users.noreply.github.com
+              run: |
+                git config --global user.name GitHub Actions
+                git config --global user.email github-actions[bot]@users.noreply.github.com
 
             - name: Setup PHP, with Composer and extensions
               uses: shivammathur/setup-php@v2
@@ -40,7 +59,23 @@ jobs:
                 cd /tmp/laravel
                 cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel.v }}.x.json | true
 
-            - name: Update main branch
+            - name: Update index file with version list
+              run: |
+                # Delete existing file
+                echo -n "" > /tmp/index.ts
+                # Create the top part of the file
+                echo $matrix | jq -r '.[].v' | awk -vOFS='' '{ print "import v", $0,  " from \"./", $0, ".x.json\""}' >> /tmp/index.ts
+                # Add a new line
+                echo "" >> /tmp/index.ts
+                # Create the commands object
+                echo "const commands = {" >> /tmp/index.ts
+                echo $matrix | jq -r '.[].v' | awk -vOFS='' '{ print "\t\"", $0, ".x\": v", $0, "," }' >> /tmp/index.ts
+                echo "}" >> /tmp/index.ts
+                echo "export default commands" >> /tmp/index.ts
+              env:
+                matrix: ${{ needs.fetch_laravel_versions.outputs.matrix }}
+
+            - name: Copy files and update readme, then commit and push
               run: |
                   n=0
                   until [ "$n" -ge 10 ]
@@ -49,11 +84,20 @@ jobs:
                     git reset --hard HEAD
                     git clean -f -d
                     git pull || true
+
+                    # Search for v={number}.x and change to v={latest version}.x
+                    latest_version=$(echo $matrix | jq -r '.[0].v')
+                    sed -i "s/v=[0-9]\+.x/v=$latest_version.x/g" ${{ github.workspace }}/README.md
+                    # Copy the new files
                     cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/pages/api/_data/
+                    cp /tmp/index.ts ${{ github.workspace }}/pages/api/_data/
+
                     git add -A || true
                     git commit -am 'Build Laravel version v${{ matrix.laravel.v }}' || true
                     git push --force && break
                     n=$((n+1))
                     sleep 15
                   done
+              env:
+                matrix: ${{ needs.fetch_laravel_versions.outputs.matrix }}
               continue-on-error: true
