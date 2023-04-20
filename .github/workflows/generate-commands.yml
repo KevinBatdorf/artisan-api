@@ -69,7 +69,7 @@ jobs:
                 echo "" >> /tmp/index.ts
                 # Create the commands object
                 echo "const commands = {" >> /tmp/index.ts
-                echo matrix | jq -r '.[].v' | awk -vOFS='' '{ print "\t\"", $0, ".x\"\: v", $0, "," }' >> /tmp/index.ts
+                echo matrix | jq -r '.[].v' | awk -vOFS='' '{ print "\t\"", $0, ".x\": v", $0, "," }' >> /tmp/index.ts
                 echo "}" >> /tmp/index.ts
                 echo "export default commands" >> /tmp/index.ts
               env:
