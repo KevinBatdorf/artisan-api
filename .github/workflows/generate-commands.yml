@@ -73,8 +73,7 @@ jobs:
                 echo "}" >> /tmp/index.ts
                 echo "export default commands" >> /tmp/index.ts
               env:
-              # get the matrix data from the previous step
-                matrix: ${{ toJson(needs.fetch_laravel_versions.outputs.matrix) }}
+                matrix: ${{ needs.fetch_laravel_versions.outputs.matrix }}
 
             - name: Update main branch
               run: |
