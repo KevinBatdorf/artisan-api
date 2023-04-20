@@ -14,19 +14,13 @@ jobs:
             run: |
                 # Fetch the latest Laravel versions from Packagist
                 curl -s https://packagist.org/packages/laravel/laravel.json \
-                # Extract the versions and their PHP requirements
-                | jq -r '.package.versions[] \
+                | jq -r '.package.versions[] \ # extract Laravel and php min version
                 | select(.require.php != null) | select(.version_normalized != null) \
                 | .version_normalized, .require.php' \
-                # Remove the minor and patch Laravel versions and dev versions, and combine into one line
-                | sed -e '/dev/,+1d' -e '1~2 s/\..*//' -e 'N;s/\n/ /' \
-                # Remove duplicate lines based on the first column
-                | sort -Vru -k1,1 | head -4 \
-                # Convert to JSON e.g {v: "8", php: ">=7.3.0"}
-                | jq -Rn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \
-                # Output the JSON to the step output
-                | tee $GITHUB_WORKSPACE/versions.json \
-                # Output the JSON to the step output
+                | sed -e '/dev/,+1d' -e '1~2 s/\..*//' -e 'N;s/\n/ /' \ # Normalize
+                | sort -Vru -k1,1 | head -4 \ # Sort, dedupe, and get the latest 4 versions
+                | jq -Rn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \ # e.g {v: "8", php: ">=7.3.0"}
+                | tee $GITHUB_WORKSPACE/versions.json
                 echo "::set-output name=versions::$(cat $GITHUB_WORKSPACE/versions.json)"
     generate:
         needs: fetch_latest_laravel_versions
