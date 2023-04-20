@@ -9,7 +9,7 @@ jobs:
         name: Fetch Latest Laravel Versions
         runs-on: ubuntu-latest
         outputs:
-            versions: ${{ steps.fetch_versions.outputs.versions }}
+            matrix: ${{ steps.fetch_versions.outputs.versions }}
         steps:
           - name: Get versions from Packagist
             id: fetch_versions
@@ -24,16 +24,16 @@ jobs:
                 | jq -r '.package.versions[] | select(.require.php != null) | select(.version_normalized != null) | .version_normalized, .require.php' \
                 | sed -e '/dev/,+1d' -e '1~2 s/\..*//' -e 'N;s/\n/ /' \
                 | sort -Vru -k1,1 | head -4 \
-                | jq -Rn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \
+                | jq -Rcn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \
                 | tee $GITHUB_WORKSPACE/versions.json
-                echo "versions=toJSON($(cat $GITHUB_WORKSPACE/versions.json))" >> "$GITHUB_OUTPUT"
+                echo "matrix=toJSON($(cat $GITHUB_WORKSPACE/versions.json))" >> "$GITHUB_OUTPUT"
     generate:
         needs: fetch_latest_laravel_versions
         name: Laravel v${{ matrix.laravel.v }} - PHP ${{ matrix.laravel.php }}
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                laravel: ${{ fromJson(needs.fetch_latest_laravel_versions.outputs.versions) }}
+                laravel: ${{ fromJson(needs.fetch_latest_laravel_versions.outputs.matrix) }}
         steps:
             - name: Check out code
               uses: actions/checkout@v3
