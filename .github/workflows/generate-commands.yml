@@ -64,14 +64,14 @@ jobs:
                 # Delete existing file
                 echo -n "" > ${{ github.workspace }}/pages/api/index.js
                 # Iterate over each version and create the file using the example above
-                for version in ${{ fromJson(needs.fetch_laravel_versions.outputs.versions) }}; do
-                    echo "import v${version} from './${version}.x.json'" >> ${{ github.workspace }}/pages/api/index.js
+                for v in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
+                    echo "import v${v} from './${v}.x.json'" >> ${{ github.workspace }}/pages/api/index.js
                 done
                 # Next add the rest of the file
                 echo "" >> ${{ github.workspace }}/pages/api/index.js
                 echo "const commands = {" >> ${{ github.workspace }}/pages/api/index.js
-                for version in ${{ fromJson(needs.fetch_laravel_versions.outputs.versions) }}; do
-                    echo "    '${version}.x': v${version}," >> ${{ github.workspace }}/pages/api/index.js
+                for v in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
+                    echo "    '${v}.x': v${v}," >> ${{ github.workspace }}/pages/api/index.js
                 done
                 echo "}" >> ${{ github.workspace }}/pages/api/index.js
                 echo "export default commands" >> ${{ github.workspace }}/pages/api/index.js
