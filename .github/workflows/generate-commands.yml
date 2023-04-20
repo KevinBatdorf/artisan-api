@@ -62,19 +62,19 @@ jobs:
             - name: Update index file with version list
               run: |
                 # Delete existing file
-                echo -n "" > /tmp/index.js
+                echo -n "" > /tmp/versons.ts
                 # Iterate over each version and create the file using the example above
-                for v in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
-                    echo "import v${v} from './${v}.x.json'" >> /tmp/index.js
+                for version in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
+                    echo "import v${version.v} from './${version.v}.x.json'" >> /tmp/versons.ts
                 done
                 # Next add the rest of the file
-                echo "" >> /tmp/index.js
-                echo "const commands = {" >> /tmp/index.js
-                for v in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
-                    echo "    '${v}.x': v${v}," >> /tmp/index.js
+                echo "" >> /tmp/versons.ts
+                echo "const commands = {" >> /tmp/versons.ts
+                for version in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
+                    echo "    '${version.v}.x': v${version.v}," >> /tmp/versons.ts
                 done
-                echo "}" >> /tmp/index.js
-                echo "export default commands" >> /tmp/index.js
+                echo "}" >> /tmp/versons.ts
+                echo "export default commands" >> /tmp/versons.ts
 
             - name: Update main branch
               run: |
@@ -86,7 +86,7 @@ jobs:
                     git clean -f -d
                     git pull || true
                     cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/pages/api/_data/
-                    cp /tmp/index.js ${{ github.workspace }}/pages/api/
+                    cp /tmp/versons.ts ${{ github.workspace }}/pages/api/
                     git add -A || true
                     git commit -am 'Build Laravel version v${{ matrix.laravel.v }}' || true
                     git push --force && break
