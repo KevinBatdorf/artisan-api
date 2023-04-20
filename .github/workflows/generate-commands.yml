@@ -25,8 +25,8 @@ jobs:
                 | sed -e '/dev/,+1d' -e '1~2 s/\..*//' -e 'N;s/\n/ /' \
                 | sort -Vru -k1,1 | head -4 \
                 | jq -Rcn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \
-                | tee ~/Desktop/versions.json
-                echo "matrix=$(cat ~/Desktop/versions.json)" >> "$GITHUB_OUTPUT"
+                | tee $GITHUB_WORKSPACE/versions.json
+                echo "matrix=$(cat $GITHUB_WORKSPACE/versions.json)" >> $GITHUB_OUTPUT
     generate:
         needs: fetch_latest_laravel_versions
         name: Laravel v${{ matrix.laravel.v }} - PHP ${{ matrix.laravel.php }}
