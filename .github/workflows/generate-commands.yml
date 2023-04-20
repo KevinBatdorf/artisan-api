@@ -98,6 +98,6 @@ jobs:
                     n=$((n+1))
                     sleep 15
                   done
-              continue-on-error: true
               env:
                 matrix: ${{ needs.fetch_laravel_versions.outputs.matrix }}
+              continue-on-error: true
