@@ -75,7 +75,7 @@ jobs:
               env:
                 matrix: ${{ needs.fetch_laravel_versions.outputs.matrix }}
 
-            - name: Update main branch
+            - name: Copy files and update readme, then commit and push
               run: |
                   n=0
                   until [ "$n" -ge 10 ]
