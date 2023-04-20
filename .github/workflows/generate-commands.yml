@@ -86,7 +86,7 @@ jobs:
                     git pull || true
 
                     # Search for v={number}.x and change to v={latest version}.x
-                    $latest_version = $matrix | jq -r '.[0].v'
+                    $latest_version=$(echo $matrix | jq -r '.[0].v')
                     sed -i "s/v=[0-9]\+.x/v=$latest_version.x/g" ${{ github.workspace }}/README.md
                     # Copy the new files
                     cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/pages/api/_data/
