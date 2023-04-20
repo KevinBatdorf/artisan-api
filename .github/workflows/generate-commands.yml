@@ -5,7 +5,7 @@ on:
   # At 08:00 Friday
   - cron: "0 8 * * 5"
 jobs:
-    fetch_latest_laravel_versions:
+    fetch_laravel_versions:
         name: Fetch Latest Laravel Versions
         runs-on: ubuntu-latest
         outputs:
@@ -26,24 +26,24 @@ jobs:
                 | sort -Vru -k1,1 | head -4 \
                 | jq -Rcn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \
                 | tee /tmp/versions.json
-                echo "matrix=$(cat /tmp/versions.json)" >> $GITHUB_OUTPUT
+                echo "matrix=$(cat /tmp/versions.json)" >> "$GITHUB_OUTPUT"
     debug:
-        needs: fetch_latest_laravel_versions
+        needs: fetch_laravel_versions
         name: Debug
         runs-on: ubuntu-latest
         steps:
             - name: Debug
               run: |
-                  echo ${{ fromJson(needs.fetch_latest_laravel_versions.outputs.matrix) }}
-                  echo ${{ fromJson(needs.fetch_latest_laravel_versions.outputs.versions) }}
-                  echo ${{ fromJson(needs.fetch_latest_laravel_versions.outputs) }}
+                  echo ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}
+                  echo ${{ fromJson(needs.fetch_laravel_versions.outputs.versions) }}
+                  echo ${{ fromJson(needs.fetch_laravel_versions.outputs) }}
     generate:
-        needs: fetch_latest_laravel_versions
+        needs: fetch_laravel_versions
         name: Laravel v${{ matrix.laravel.v }} - PHP ${{ matrix.laravel.php }}
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                laravel: ${{ fromJson(needs.fetch_latest_laravel_versions.outputs.matrix) }}
+                laravel: ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}
         steps:
             - name: Check out code
               uses: actions/checkout@v3
@@ -72,13 +72,13 @@ jobs:
                 # Delete existing file
                 echo -n "" > ${{ github.workspace }}/pages/api/index.js
                 # Iterate over each version and create the file using the example above
-                for version in ${{ fromJson(needs.fetch_latest_laravel_versions.outputs.versions) }}; do
+                for version in ${{ fromJson(needs.fetch_laravel_versions.outputs.versions) }}; do
                     echo "import v${version} from './${version}.x.json'" >> ${{ github.workspace }}/pages/api/index.js
                 done
                 # Next add the rest of the file
                 echo "" >> ${{ github.workspace }}/pages/api/index.js
                 echo "const commands = {" >> ${{ github.workspace }}/pages/api/index.js
-                for version in ${{ fromJson(needs.fetch_latest_laravel_versions.outputs.versions) }}; do
+                for version in ${{ fromJson(needs.fetch_laravel_versions.outputs.versions) }}; do
                     echo "    '${version}.x': v${version}," >> ${{ github.workspace }}/pages/api/index.js
                 done
                 echo "}" >> ${{ github.workspace }}/pages/api/index.js
