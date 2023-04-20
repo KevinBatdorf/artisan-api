@@ -75,14 +75,6 @@ jobs:
               env:
                 matrix: ${{ needs.fetch_laravel_versions.outputs.matrix }}
 
-            - name: Update readme version reference
-              run: |
-                # search for v={number}.x and change to v={latest version}.x
-                $latest_version = $matrix | jq -r '.[0].v'
-                sed -i "s/v=[0-9]\+.x/v=$latest_version.x/g" ${{ github.workspace }}/README.md
-              env:
-                matrix: ${{ needs.fetch_laravel_versions.outputs.matrix }}
-
             - name: Update main branch
               run: |
                   n=0
@@ -92,8 +84,14 @@ jobs:
                     git reset --hard HEAD
                     git clean -f -d
                     git pull || true
+
+                    # Search for v={number}.x and change to v={latest version}.x
+                    $latest_version = $matrix | jq -r '.[0].v'
+                    sed -i "s/v=[0-9]\+.x/v=$latest_version.x/g" ${{ github.workspace }}/README.md
+                    # Copy the new files
                     cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/pages/api/_data/
                     cp /tmp/index.ts ${{ github.workspace }}/pages/api/_data/
+
                     git add -A || true
                     git commit -am 'Build Laravel version v${{ matrix.laravel.v }}' || true
                     git push --force && break
@@ -101,3 +99,5 @@ jobs:
                     sleep 15
                   done
               continue-on-error: true
+              env:
+                matrix: ${{ needs.fetch_laravel_versions.outputs.matrix }}
