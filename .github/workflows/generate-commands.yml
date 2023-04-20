@@ -62,19 +62,19 @@ jobs:
             - name: Update index file with version list
               run: |
                 # Delete existing file
-                echo -n "" > ${{ github.workspace }}/pages/api/index.js
+                echo -n "" > /tmp/api/index.js
                 # Iterate over each version and create the file using the example above
                 for v in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
-                    echo "import v${v} from './${v}.x.json'" >> ${{ github.workspace }}/pages/api/index.js
+                    echo "import v${v} from './${v}.x.json'" >> /tmp/api/index.js
                 done
                 # Next add the rest of the file
-                echo "" >> ${{ github.workspace }}/pages/api/index.js
-                echo "const commands = {" >> ${{ github.workspace }}/pages/api/index.js
+                echo "" >> /tmp/api/index.js
+                echo "const commands = {" >> /tmp/api/index.js
                 for v in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
-                    echo "    '${v}.x': v${v}," >> ${{ github.workspace }}/pages/api/index.js
+                    echo "    '${v}.x': v${v}," >> /tmp/api/index.js
                 done
-                echo "}" >> ${{ github.workspace }}/pages/api/index.js
-                echo "export default commands" >> ${{ github.workspace }}/pages/api/index.js
+                echo "}" >> /tmp/api/index.js
+                echo "export default commands" >> /tmp/api/index.js
 
             - name: Update main branch
               run: |
@@ -86,6 +86,7 @@ jobs:
                     git clean -f -d
                     git pull || true
                     cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/pages/api/_data/
+                    cp /tmp/index.js ${{ github.workspace }}/pages/api/
                     git add -A || true
                     git commit -am 'Build Laravel version v${{ matrix.laravel.v }}' || true
                     git push --force && break
