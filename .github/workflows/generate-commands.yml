@@ -8,6 +8,8 @@ jobs:
     fetch_latest_laravel_versions:
         name: Fetch Latest Laravel Versions
         runs-on: ubuntu-latest
+        outputs:
+            versions: ${{ steps.fetch_versions.outputs.versions }}
         steps:
           - name: Get versions from Packagist
             id: fetch_versions
@@ -24,7 +26,7 @@ jobs:
                 | sort -Vru -k1,1 | head -4 \
                 | jq -Rn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \
                 | tee $GITHUB_WORKSPACE/versions.json
-                echo "versions=$(cat $GITHUB_WORKSPACE/versions.json)" >> $GITHUB_OUTPUT
+                echo "versions=$(cat $GITHUB_WORKSPACE/versions.json)" >> "$GITHUB_OUTPUT"
     generate:
         needs: fetch_latest_laravel_versions
         name: Laravel v${{ matrix.laravel.v }} - PHP ${{ matrix.laravel.php }}
