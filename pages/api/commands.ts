@@ -20,8 +20,7 @@ export default async function handler(
 
     const versions = Object.keys(commands)
     const version =
-        versions?.find((version) => version === v?.toString()) ??
-        versions.at(-1)
+        versions?.find((version) => version === v?.toString()) ?? versions.at(0)
     const json = commands[version as keyof typeof commands]
 
     // Search the list for the search term if provided
