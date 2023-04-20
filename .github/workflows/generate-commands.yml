@@ -9,7 +9,7 @@ jobs:
         name: Fetch Latest Laravel Versions
         runs-on: ubuntu-latest
         steps:
-            name: Get versions from Packagist
+          - name: Get versions from Packagist
             id: fetch_versions
             run: |
                 # Fetch the latest Laravel versions from Packagist
