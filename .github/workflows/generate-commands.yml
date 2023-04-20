@@ -9,7 +9,7 @@ jobs:
         name: Fetch Latest Laravel Versions
         runs-on: ubuntu-latest
         outputs:
-            matrix: ${{ steps.fetch_versions.outputs.versions }}
+            matrix: ${{ steps.fetch_versions.outputs.matrix }}
         steps:
           - name: Get versions from Packagist
             id: fetch_versions
