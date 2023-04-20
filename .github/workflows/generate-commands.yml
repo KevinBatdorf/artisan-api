@@ -40,9 +40,9 @@ jobs:
             - name: Check out code
               uses: actions/checkout@v3
             - name: Set up git user
-              run: git config --global user.name ${GITHUB_ACTOR}
-            - name: Set up git email
-              run: git config --global user.email ${GITHUB_ACTOR}@users.noreply.github.com
+              run: |
+                git config --global user.name GitHub Actions
+                git config --global user.email github-actions[bot]@users.noreply.github.com
 
             - name: Setup PHP, with Composer and extensions
               uses: shivammathur/setup-php@v2
