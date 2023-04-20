@@ -13,11 +13,18 @@ jobs:
             id: fetch_versions
             run: |
                 # Fetch the latest Laravel versions from Packagist
+                # Convert to JSON e.g {v: "8", php: ">=7.3.0"}
+                # Extract the versions and their PHP requirements
+                # Remove duplicate lines based on the first column
+                # Get major v only, dedupe, and combine on one line
+                # Output the JSON to the step output
                 curl -s https://packagist.org/packages/laravel/laravel.json \
-                | jq -r '.package.versions[] | select(.require.php != null) | select(.version_normalized != null) | .version_normalized, .require.php' # e.g 8.0.0, >=7.3.0 \
-                | sed -e '/dev/,+1d' -e '1~2 s/\..*//' -e 'N;s/\n/ /' # Normalize \
-                | sort -Vru -k1,1 | head -4 # Sort, dedupe, and get the latest 4 versions \
-                | jq -Rn '[inputs | split(" ") | {v:.[0], php:.[1]}]' # e.g {v: "8", php: ">=7.3.0"} \
+                | jq -r '.package.versions[] \
+                | select(.require.php != null) | select(.version_normalized != null) \
+                | .version_normalized, .require.php' \
+                | sed -e '/dev/,+1d' -e '1~2 s/\..*//' -e 'N;s/\n/ /' \
+                | sort -Vru -k1,1 | head -4 \
+                | jq -Rn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \
                 | tee $GITHUB_WORKSPACE/versions.json
                 echo "::set-output name=versions::$(cat $GITHUB_WORKSPACE/versions.json)"
     generate:
