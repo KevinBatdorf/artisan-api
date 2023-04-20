@@ -64,12 +64,12 @@ jobs:
                 # Delete existing file
                 echo -n "" > /tmp/index.ts
                 # Create the top part of the file
-                echo ${needs.fetch_laravel_versions.outputs.matrix} | jq -r '.[].v' | awk -vOFS='' '{ print "import v", $0,  " from \"", $0, ".x.json\""}' >> /tmp/index.ts
+                echo ${fromJson(needs.fetch_laravel_versions.outputs.matrix)} | jq -r '.[].v' | awk -vOFS='' '{ print "import v", $0,  " from \"", $0, ".x.json\""}' >> /tmp/index.ts
                 # Add a new line
                 echo "" >> /tmp/index.ts
                 # Create the commands object
                 echo "const commands = {" >> /tmp/index.ts
-                echo ${needs.fetch_laravel_versions.outputs.matrix} | jq -r '.[].v' | awk -vOFS='' '{ print "\t\"", $0, ".x\"\: v", $0, "," }' >> /tmp/index.ts
+                echo ${fromJson(needs.fetch_laravel_versions.outputs.matrix)} | jq -r '.[].v' | awk -vOFS='' '{ print "\t\"", $0, ".x\"\: v", $0, "," }' >> /tmp/index.ts
                 echo "}" >> /tmp/index.ts
                 echo "export default commands" >> /tmp/index.ts
 
