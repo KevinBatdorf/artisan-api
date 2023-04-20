@@ -25,7 +25,7 @@ jobs:
                 | sed -e '/dev/,+1d' -e '1~2 s/\..*//' -e '2~2 s/|.*$//' -e 's/[^0-9]*//' \
                 | cut -f1,2 -d'.' \
                 | awk 'NR%2{printf "%s ",$0;next;}1' \
-                | sort -Vru -k1,1 | head -4 \
+                | sort -Vru -k1,1 \
                 | jq -Rcn '[inputs | split(" ") | {v:.[0], php:.[1]}]' \
                 | tee /tmp/versions.json
                 echo "matrix=$(cat /tmp/versions.json)" >> "$GITHUB_OUTPUT"
