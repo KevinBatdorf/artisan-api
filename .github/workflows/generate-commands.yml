@@ -64,7 +64,7 @@ jobs:
                 # Delete existing file
                 echo -n "" > /tmp/index.ts
                 # Create the top part of the file
-                echo $matrix | jq -r '.[].v' | awk -vOFS='' '{ print "import v", $0,  " from \"", $0, ".x.json\""}' >> /tmp/index.ts
+                echo $matrix | jq -r '.[].v' | awk -vOFS='' '{ print "import v", $0,  " from \"./", $0, ".x.json\""}' >> /tmp/index.ts
                 # Add a new line
                 echo "" >> /tmp/index.ts
                 # Create the commands object
