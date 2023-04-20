@@ -62,19 +62,18 @@ jobs:
             - name: Update index file with version list
               run: |
                 # Delete existing file
-                echo -n "" > /tmp/versons.ts
-                # Iterate over each version and create the file using the example above
-                for version in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
-                    echo "import v${version.v} from './${version.v}.x.json'" >> /tmp/versons.ts
-                done
-                # Next add the rest of the file
-                echo "" >> /tmp/versons.ts
-                echo "const commands = {" >> /tmp/versons.ts
-                for version in ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}; do
-                    echo "    '${version.v}.x': v${version.v}," >> /tmp/versons.ts
-                done
-                echo "}" >> /tmp/versons.ts
-                echo "export default commands" >> /tmp/versons.ts
+                echo -n "" > /tmp/index.ts
+                # Create the top part of the file
+                echo ${needs.fetch_laravel_versions.outputs.matrix} | jq -r '.[].v' | awk -vOFS='' '{ print "import v", $0,  " from \"", $0, ".x.json\""}' >> /tmp/index.ts
+                # Add a new line
+                echo "" >> /tmp/index.ts
+                # Create the commands object
+                echo "const commands = {" >> /tmp/index.ts
+                echo ${needs.fetch_laravel_versions.outputs.matrix} | jq -r '.[].v' | awk -vOFS='' '{ print "\t\"", $0, ".x\"\: v", $0, "," }' >> /tmp/index.ts
+                echo "}" >> /tmp/index.ts
+                echo "export default commands" >> /tmp/index.ts
+
+
 
             - name: Update main branch
               run: |
@@ -86,7 +85,7 @@ jobs:
                     git clean -f -d
                     git pull || true
                     cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/pages/api/_data/
-                    cp /tmp/versons.ts ${{ github.workspace }}/pages/api/
+                    cp /tmp/index.ts ${{ github.workspace }}/pages/api/_data/
                     git add -A || true
                     git commit -am 'Build Laravel version v${{ matrix.laravel.v }}' || true
                     git push --force && break
