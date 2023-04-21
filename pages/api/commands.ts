@@ -28,8 +28,17 @@ export default async function handler(req: NextRequest, res: NextResponse) {
     let results
     if (search?.toString()) {
         const fuse = new Fuse(json, {
-            keys: ['name', 'description', 'aliases'],
+            keys: [
+                'name',
+                'aliases',
+                'description',
+                'synopsis',
+                'arguments.description',
+                'options.description',
+            ],
+            ignoreLocation: true,
         })
+        // console.log(fuse.search(search?.toString()))
         results = fuse.search(search?.toString()).map((result) => result.item)
     }
 
