@@ -17,6 +17,8 @@ export default async function handler(req: NextRequest, res: NextResponse) {
         })
     }
 
+    const start = Date.now()
+
     const versions = Object.keys(commands)
     const version =
         versions?.find((version) => version === v?.toString()) ?? versions.at(0)
@@ -32,6 +34,8 @@ export default async function handler(req: NextRequest, res: NextResponse) {
     }
 
     const data = {
+        search: search ? search.toString() : undefined,
+        time: search ? Date.now() - start + 'ms' : undefined,
         version: version,
         commands: results ?? json,
     }
