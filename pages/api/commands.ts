@@ -34,8 +34,6 @@ export default async function handler(req: NextRequest, res: NextResponse) {
     }
 
     const data = {
-        search: search ? search.toString() : undefined,
-        time: search ? Date.now() - start + 'ms' : undefined,
         version: version,
         commands: results ?? json,
     }
@@ -43,7 +41,10 @@ export default async function handler(req: NextRequest, res: NextResponse) {
         req,
         new NextResponse(JSON.stringify(data), {
             status: 200,
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Search-Latency': `${Date.now() - start}ms`,
+            },
         }),
     )
 }
