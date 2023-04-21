@@ -5,6 +5,10 @@ import initMiddleware from '../../lib/init-middleware'
 
 const cors = initMiddleware(Cors({ methods: ['GET', 'OPTIONS'] }))
 
+export const config = {
+	runtime: 'edge',
+};
+
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse,
