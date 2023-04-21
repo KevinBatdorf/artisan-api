@@ -28,18 +28,27 @@ export default async function handler(req: NextRequest, res: NextResponse) {
     let results
     if (search?.toString()) {
         const fuse = new Fuse(json, {
-            keys: [
-                'name',
-                'aliases',
-                'description',
-                'synopsis',
-                'arguments.description',
-                'options.description',
-            ],
+            keys: ['name', 'aliases', 'description', 'synopsis'],
             ignoreLocation: true,
+            includeScore: true,
+            threshold: 0.5,
         })
-        // console.log(fuse.search(search?.toString()))
-        results = fuse.search(search?.toString()).map((result) => result.item)
+        const fuse2 = new Fuse(json, {
+            keys: ['arguments.description', 'options.description'],
+            ignoreLocation: true,
+            includeScore: true,
+            threshold: 0.1,
+        })
+        const search1 = fuse.search(search?.toString())
+        const search2 = fuse2.search(search?.toString())
+        results = [...search1, ...search2]
+        // sort by score
+        results.sort((a, b) => (a?.score ?? 0) - (b?.score ?? 0))
+        // map to items
+        results = results
+            .map((r) => r.item)
+            // remove duplicates
+            .filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i)
     }
 
     const data = {
