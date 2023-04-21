@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextRequest, NextResponse } from 'next/server'
 import commands from './_data'
 import Cors from 'cors'
 import initMiddleware from '../../lib/init-middleware'
@@ -6,18 +6,20 @@ import initMiddleware from '../../lib/init-middleware'
 const cors = initMiddleware(Cors({ methods: ['GET', 'OPTIONS'] }))
 
 export const config = {
-	runtime: 'edge',
-};
+    runtime: 'edge',
+}
 
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse,
-) {
+export default async function handler(req: NextRequest, res: NextResponse) {
     await cors(req, res)
     if (req.method !== 'GET') {
-        return res.status(405).json({})
+        return new Response(JSON.stringify({}), {
+            status: 405,
+        })
     }
-    return res.status(200).json({
-        versions: Object.keys(commands),
-    })
+    return new NextResponse(
+        JSON.stringify({
+            versions: Object.keys(commands),
+        }),
+        { status: 200 },
+    )
 }
