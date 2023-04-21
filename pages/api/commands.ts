@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Fuse from 'fuse.js'
 import commands from './_data'
-import Cors from 'cors'
-import initMiddleware from '../../lib/init-middleware'
-
-const cors = initMiddleware(Cors({ methods: ['GET', 'OPTIONS'] }))
+import cors from '../../lib/cors'
 
 export const config = {
     runtime: 'edge',
 }
 
 export default async function handler(req: NextRequest, res: NextResponse) {
-    await cors(req, res)
-
     const search = req.nextUrl.searchParams.get('s')
     const v = req.nextUrl.searchParams.get('v')
 
@@ -40,5 +35,11 @@ export default async function handler(req: NextRequest, res: NextResponse) {
         version: version,
         commands: results ?? json,
     }
-    return new NextResponse(JSON.stringify(data), { status: 200 })
+    return cors(
+        req,
+        new NextResponse(JSON.stringify(data), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+        }),
+    )
 }
