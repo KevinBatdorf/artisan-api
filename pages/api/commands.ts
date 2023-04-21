@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextRequest, NextResponse } from 'next/server'
 import Fuse from 'fuse.js'
 import commands from './_data'
 import Cors from 'cors'
@@ -10,16 +10,16 @@ export const config = {
     runtime: 'edge',
 }
 
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse,
-) {
+export default async function handler(req: NextRequest, res: NextResponse) {
     await cors(req, res)
 
-    const { v, s: search } = req.query
+    const search = req.nextUrl.searchParams.get('s')
+    const v = req.nextUrl.searchParams.get('v')
 
     if (req.method !== 'GET') {
-        return res.status(405).json({})
+        return new Response(JSON.stringify({}), {
+            status: 405,
+        })
     }
 
     const versions = Object.keys(commands)
@@ -40,5 +40,5 @@ export default async function handler(
         version: version,
         commands: results ?? json,
     }
-    return res.status(200).json(data)
+    return new NextResponse(JSON.stringify(data), { status: 200 })
 }
