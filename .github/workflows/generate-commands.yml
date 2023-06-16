@@ -61,6 +61,11 @@ jobs:
                 cd /tmp/laravel
                 cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel.v }}.x.json | true
 
+            - name: Touch last updated file
+              run: |
+                # Update file with current time to keep GH action from disabling itself
+                date > ${{ github.workspace }}/last-updated.txt
+
             - name: Update index file with version list
               run: |
                 # Delete existing file
