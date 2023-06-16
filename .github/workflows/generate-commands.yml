@@ -61,6 +61,11 @@ jobs:
                 cd /tmp/laravel
                 cat ${{ github.workspace }}/scripts/generate | php artisan tinker > /tmp/${{ matrix.laravel.v }}.x.json | true
 
+            - name: Touch last updated file
+              run: |
+                # Aways update a file to keep GH action from disabling itself
+                date > /tmp/last-updated.txt
+
             - name: Update index file with version list
               run: |
                 # Delete existing file
@@ -93,6 +98,7 @@ jobs:
                     # Copy the new files
                     cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/pages/api/_data/
                     cp /tmp/index.ts ${{ github.workspace }}/pages/api/_data/
+                    cp /tmp/last-updated.txt ${{ github.workspace }}/pages/api/_data/
 
                     git add -A || true
                     git commit -am 'Build Laravel version v${{ matrix.laravel.v }}' || true
