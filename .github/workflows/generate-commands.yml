@@ -40,7 +40,7 @@ jobs:
                 laravel: ${{ fromJson(needs.fetch_laravel_versions.outputs.matrix) }}
         steps:
             - name: Check out code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Set up git user
               run: |
                 git config --global user.name GitHub Actions
