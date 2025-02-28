@@ -13,6 +13,6 @@ Search for a command ([Try it](https://artisan-api.vercel.app/api/commands?s=dat
 ```
 GET /api/commands?s=database
 ```
-Specify a version ([Try it](https://artisan-api.vercel.app/api/commands?v=10.x))
+Specify a version ([Try it](https://artisan-api.vercel.app/api/commands?v=11.x))
 ```
-GET /api/commands?v=10.x
+GET /api/commands?v=11.x
