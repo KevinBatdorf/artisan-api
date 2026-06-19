@@ -11,6 +11,9 @@ export default async function handler(req: NextRequest, res: NextResponse) {
     const search = req.nextUrl.searchParams.get('s')
     const v = req.nextUrl.searchParams.get('v')
 
+    if (req.method === 'OPTIONS') {
+        return cors(req, new NextResponse(null))
+    }
     if (req.method !== 'GET') {
         return new Response(JSON.stringify({}), {
             status: 405,

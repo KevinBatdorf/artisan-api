@@ -7,6 +7,9 @@ export const config = {
 }
 
 export default async function handler(req: NextRequest, res: NextResponse) {
+    if (req.method === 'OPTIONS') {
+        return cors(req, new NextResponse(null))
+    }
     if (req.method !== 'GET') {
         return new Response(JSON.stringify({}), {
             status: 405,
