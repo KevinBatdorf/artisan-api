@@ -54,7 +54,12 @@ jobs:
                 tools: composer:v2
 
             - name: Install Laravel
-              run: composer create-project --no-progress laravel/laravel="^${{ matrix.laravel.v }}" /tmp/laravel
+              # Disable Composer advisory block so EOL installs work.
+              run: |
+                composer create-project --no-progress --no-install laravel/laravel="^${{ matrix.laravel.v }}" /tmp/laravel
+                cd /tmp/laravel
+                composer config policy.advisories.block false
+                composer install --no-progress
 
             - name: Run Generator Command
               run: |
