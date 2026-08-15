@@ -101,9 +101,9 @@ jobs:
                     latest_version=$(echo $matrix | jq -r '.[1].v')
                     sed -i "s/v=[0-9]\+.x/v=$latest_version.x/g" ${{ github.workspace }}/README.md
                     # Copy the new files
-                    cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/pages/api/_data/
-                    cp /tmp/index.ts ${{ github.workspace }}/pages/api/_data/
-                    cp /tmp/last-updated.txt ${{ github.workspace }}/pages/api/_data/
+                    cp /tmp/${{ matrix.laravel.v }}.x.json ${{ github.workspace }}/lib/data/
+                    cp /tmp/index.ts ${{ github.workspace }}/lib/data/
+                    cp /tmp/last-updated.txt ${{ github.workspace }}/lib/data/
 
                     git add -A || true
                     git commit -am 'Build Laravel version v${{ matrix.laravel.v }}' || true

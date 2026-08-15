@@ -1,24 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Fuse from 'fuse.js'
-import commands from './_data'
-import cors from '../../lib/cors'
+import commands from '../../../lib/data'
+import cors from '../../../lib/cors'
 
-export const config = {
-    runtime: 'edge',
+export async function OPTIONS(req: NextRequest) {
+    return cors(req, new NextResponse(null))
 }
 
-export default async function handler(req: NextRequest, res: NextResponse) {
+export async function GET(req: NextRequest) {
     const search = req.nextUrl.searchParams.get('s')
     const v = req.nextUrl.searchParams.get('v')
-
-    if (req.method === 'OPTIONS') {
-        return cors(req, new NextResponse(null))
-    }
-    if (req.method !== 'GET') {
-        return new Response(JSON.stringify({}), {
-            status: 405,
-        })
-    }
 
     const start = Date.now()
 
